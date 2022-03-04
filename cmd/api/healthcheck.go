@@ -1,20 +1,30 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 )
 
 func (app *application) healthcheckHandler(w http.ResponseWriter, r *http.Request) {
-	// Creating a fixed-format JSON response from a string.
-	// Raw string literals are used so as to include double-quote without needing to scape
-	js := `{"status": "available", "environment": %q, "version": %q}`
-	js = fmt.Sprintf(js, app.config.env, version)
+	// map that holds all information that will be sent in the response
+	data := map[string]string{
+		"status":      "available",
+		"environment": app.config.env,
+		"version":     version,
+	}
 
-	// Setting "Content-Type: application/json" in the header of our response.
-	// this overrides the default "text/plain" "charset=utf-8"
+	// Marshaling the map to JSON.
+	js, err := json.Marshal(data)
+	if err != nil {
+		app.logger.Println(err)
+		http.Error(w, "The server encountered a problem and could not process your request", http.StatusInternalServerError)
+		return
+	}
+
+	// appending a newline is just cosmetic, it will make it easier to read in the terminal
+	js = append(js, '\n')
+
+	// set content type and write response
 	w.Header().Set("Content-Type", "application/json")
-
-	// Write said JSON to response body
-	w.Write([]byte(js))
+	w.Write(js)
 }
