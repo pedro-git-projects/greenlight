@@ -12,6 +12,10 @@ func (app *application) routes() *httprouter.Router {
 	// initializing a new httprouter instance
 	router := httprouter.New()
 
+	// configuring router to use our custom error treatment
+	router.NotFound = http.HandlerFunc(app.notFoundResponse)
+	router.MethodNotAllowed = http.HandlerFunc(app.methodNotAllowedResponse)
+
 	// Register the relevant methods, URL patterns and handler functions for our
 	// endpoints using the HandlerFunc() method. Note that http.MethodGet and
 	// http.MethodPost are constants which equate to the strings "GET" and "POST"
