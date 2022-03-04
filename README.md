@@ -33,6 +33,15 @@ To change the environment you can pass -env=\<environment\>
 
 ---
 
+# Dependencies
+
+## httprouter
+
+When building API endpoints without thrid party libraries we face the limitation that the http.ServeMux does not allow routing to different handlers based on the request method. It doesn't provide support for clean URLs with interpolated paramters either.
+
+Thus the choice was made to use  julienschmidt's httprouter for it solves both this problems and is extremely performant because it uses a radix sort algorithm for URL matching. 
+
+---
 # Miscellaneous
 
 ## URL prefixing
