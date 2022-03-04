@@ -30,3 +30,17 @@
 To change the port the application will run on you can invoke the flag -port=\<port number\>
 
 To change the environment you can pass -env=\<environment\>
+
+---
+
+# Miscellaneous
+
+## URL prefixing
+
+As one can see in the endpoints, all of them are prefixed with v1. As in real business users often need to change endpoints functionality overtime, sometimes breaking backwards compatibility, versioning needs to be implemented. There are two common approaches for doing so:
+
+- Prefixing URLs, like done here
+
+- Using custom *Accept* and *Content-Type* headers on requests and responses, ie: Accept: application/vnd.greenlight-v1.
+
+Even though custom headers are arguably "purer", I think URL prefixes come out on top regarding ease of use, thus the API was written this way.
