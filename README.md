@@ -20,3 +20,13 @@
 | Post   | /v1/tokens/authentication | Generate a new authentication token      |
 | Post   | /v1/tokens/password-reset | Generate a new password-reset token      |
 | Get    | /debug/vars               | Display application metrics              |
+
+---
+
+# Usage
+
+## Flags
+
+To change the port the application will run on you can invoke the flag -port=<port number>
+
+To change the environment you can pass -env=<environment>
