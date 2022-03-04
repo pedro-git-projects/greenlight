@@ -27,6 +27,6 @@
 
 ## Flags
 
-To change the port the application will run on you can invoke the flag -port=<port number>
+To change the port the application will run on you can invoke the flag -port=\<port number\>
 
-To change the environment you can pass -env=<environment>
+To change the environment you can pass -env=\<environment\>
