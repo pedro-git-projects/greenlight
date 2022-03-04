@@ -24,7 +24,7 @@ func (app *application) readIDParam(r *http.Request) (int64, error) {
 *  It takes the destination http.ResponseWriter, the status code to send, the data to be mashaled and
 *  a header map containing additional headers we might want to send in the response */
 func (app *application) WriteJSON(w http.ResponseWriter, status int, data interface{}, headers http.Header) error {
-	js, err := json.Marshal(data)
+	js, err := json.MarshalIndent(data, "", "\t")
 	if err != nil {
 		return err
 	}
