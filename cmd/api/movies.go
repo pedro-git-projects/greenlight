@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -8,10 +9,19 @@ import (
 	"github.com/pedro-git-projects/greenlight/internal/data"
 )
 
+// createMovieHandler reads data from the client and creates a new movie
 func (app *application) createMovieHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "create a movie")
+	input := &movieDTO{}
+	if err := json.NewDecoder(r.Body).Decode(input); err != nil {
+		app.errorResponse(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	fmt.Fprintf(w, "%v\n", *input)
 }
 
+// showMovieHandler displays the movie with specified ID
+// it redirects to a 404 otherwise
 func (app *application) showMovieHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := app.readIDParam(r)
 	if err != nil {
