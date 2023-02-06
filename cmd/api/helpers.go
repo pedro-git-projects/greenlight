@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -54,7 +55,12 @@ func (app *application) writeJSON(w http.ResponseWriter, status int, data envelo
 
 func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dto any) error {
 
-	err := json.NewDecoder(r.Body).Decode(dto)
+	var maxBytes int64 = 1_048_576
+	r.Body = http.MaxBytesReader(w, r.Body, maxBytes)
+
+	dec := json.NewDecoder(r.Body)
+	dec.DisallowUnknownFields()
+	err := dec.Decode(dto)
 	if err != nil {
 
 		var syntaxErr *json.SyntaxError
@@ -64,20 +70,37 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dto any
 		switch {
 		case errors.As(err, &syntaxErr):
 			return fmt.Errorf("body contains malformed JSON at character %d", syntaxErr.Offset)
+
 		case errors.Is(err, io.ErrUnexpectedEOF):
 			return errors.New("body contains malformed JSON")
+
 		case errors.As(err, &typeErr):
 			if typeErr.Field != "" {
 				return fmt.Errorf("body contains incoreect JSON type for field %q", typeErr.Field)
 			}
 			return fmt.Errorf("body contains incorrect JSON type at character %d", typeErr.Offset)
+
 		case errors.Is(err, io.EOF):
 			return errors.New("body must not be empty")
+
+		case strings.HasPrefix(err.Error(), "json: unknown filed "):
+			field := strings.TrimPrefix(err.Error(), "json: unknown field ")
+			return fmt.Errorf("body contains unknown key %s", field)
+
+		case err.Error() == "http: request body too large":
+			return fmt.Errorf("body must not be larger than %d bytes", maxBytes)
+
 		case errors.As(err, &invalidErr):
 			panic(err)
+
 		default:
 			return err
 		}
 	}
+
+	if err = dec.Decode(&struct{}{}); err != nil {
+		return errors.New("body must contain a single JSON value")
+	}
+
 	return nil
 }

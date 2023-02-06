@@ -12,7 +12,7 @@ import (
 func (app *application) createMovieHandler(w http.ResponseWriter, r *http.Request) {
 	input := &movieDTO{}
 	if err := app.readJSON(w, r, &input); err != nil {
-		app.errorResponse(w, r, http.StatusBadRequest, err.Error())
+		app.badRequestResponse(w, r, err)
 		return
 	}
 
