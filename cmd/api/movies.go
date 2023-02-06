@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -12,7 +11,7 @@ import (
 // createMovieHandler reads data from the client and creates a new movie
 func (app *application) createMovieHandler(w http.ResponseWriter, r *http.Request) {
 	input := &movieDTO{}
-	if err := json.NewDecoder(r.Body).Decode(input); err != nil {
+	if err := app.readJSON(w, r, &input); err != nil {
 		app.errorResponse(w, r, http.StatusBadRequest, err.Error())
 		return
 	}

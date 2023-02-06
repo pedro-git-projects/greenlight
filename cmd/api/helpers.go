@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -47,5 +49,35 @@ func (app *application) writeJSON(w http.ResponseWriter, status int, data envelo
 	w.WriteHeader(status)
 	w.Write(json)
 
+	return nil
+}
+
+func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dto any) error {
+
+	err := json.NewDecoder(r.Body).Decode(dto)
+	if err != nil {
+
+		var syntaxErr *json.SyntaxError
+		var typeErr *json.UnmarshalTypeError
+		var invalidErr *json.InvalidUnmarshalError
+
+		switch {
+		case errors.As(err, &syntaxErr):
+			return fmt.Errorf("body contains malformed JSON at character %d", syntaxErr.Offset)
+		case errors.Is(err, io.ErrUnexpectedEOF):
+			return errors.New("body contains malformed JSON")
+		case errors.As(err, &typeErr):
+			if typeErr.Field != "" {
+				return fmt.Errorf("body contains incoreect JSON type for field %q", typeErr.Field)
+			}
+			return fmt.Errorf("body contains incorrect JSON type at character %d", typeErr.Offset)
+		case errors.Is(err, io.EOF):
+			return errors.New("body must not be empty")
+		case errors.As(err, &invalidErr):
+			panic(err)
+		default:
+			return err
+		}
+	}
 	return nil
 }
