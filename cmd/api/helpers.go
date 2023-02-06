@@ -76,7 +76,7 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dto any
 
 		case errors.As(err, &typeErr):
 			if typeErr.Field != "" {
-				return fmt.Errorf("body contains incoreect JSON type for field %q", typeErr.Field)
+				return fmt.Errorf("body contains incorrect JSON type for field %q", typeErr.Field)
 			}
 			return fmt.Errorf("body contains incorrect JSON type at character %d", typeErr.Offset)
 
@@ -98,7 +98,8 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dto any
 		}
 	}
 
-	if err = dec.Decode(&struct{}{}); err != nil {
+	err = dec.Decode(&struct{}{})
+	if err != io.EOF {
 		return errors.New("body must contain a single JSON value")
 	}
 
