@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/pedro-git-projects/greenlight/internal/data"
+	"github.com/pedro-git-projects/greenlight/internal/validator"
 )
 
 // createMovieHandler reads data from the client and creates a new movie
@@ -16,7 +16,12 @@ func (app *application) createMovieHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	fmt.Fprintf(w, "%v\n", *input)
+	v := validator.New()
+	if validateMovieDTO(v, input); !v.IsValid() {
+		app.failedValidationResponse(w, r, v.Errors)
+		return
+	}
+
 }
 
 // showMovieHandler displays the movie with specified ID
