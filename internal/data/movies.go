@@ -22,3 +22,10 @@ func MovieFromDTO(dto *MovieDTO) *Movie {
 		Genres:  dto.Genres,
 	}
 }
+
+func (m *Movie) CopyDTOFields(dto *MovieDTO) {
+	m.Title = dto.Title
+	m.Year = dto.Year
+	m.Runtime = dto.Runtime
+	m.Genres = dto.Genres
+}
