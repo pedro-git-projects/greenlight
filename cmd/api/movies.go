@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/pedro-git-projects/greenlight/internal/data"
 	"github.com/pedro-git-projects/greenlight/internal/validator"
@@ -46,17 +45,12 @@ func (app *application) showMovieHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	movie := &data.Movie{
-		ID:        id,
-		CreatedAt: time.Now(),
-		Title:     "Casablanca",
-		Runtime:   102,
-		Genres:    []string{"romance", "drama", "war"},
-		Version:   1,
+	movie, err := app.models.Movies.Get(id)
+	if err != nil {
+		app.internalServerErr(w, r, err)
 	}
 
 	if err := app.writeJSON(w, http.StatusOK, envelope{"movie": movie}, nil); err != nil {
 		app.internalServerErr(w, r, err)
 	}
-
 }
