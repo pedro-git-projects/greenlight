@@ -86,13 +86,13 @@ func (app *application) updateMovieHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	movie.CopyDTOFields(input)
 	v := validator.New()
-	if data.ValidateMovieDTO(v, input); !v.IsValid() {
+	if movie.ValidateMovie(v); !v.IsValid() {
 		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}
 
-	movie.CopyDTOFields(input)
 	if err := app.models.Movies.Update(movie); err != nil {
 		app.internalServerErr(w, r, err)
 		return

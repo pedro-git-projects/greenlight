@@ -10,23 +10,26 @@ const (
 	required = "must be provided"
 )
 
+// All dto fields are pointer because
+// the zero value of a pointer type is nil.
+// This facilitates user input checking
 type MovieDTO struct {
-	Title   string   `json:"title"`
-	Year    int32    `json:"year"`
-	Runtime Runtime  `json:"runtime"`
+	Title   *string  `json:"title"`
+	Year    *int32   `json:"year"`
+	Runtime *Runtime `json:"runtime"`
 	Genres  []string `json:"genres"`
 }
 
 func ValidateMovieDTO(v *validator.Validator, movie *MovieDTO) {
-	v.Check(movie.Title != "", "title", required)
-	v.Check(len(movie.Title) <= 500, "title", "must be nomore than 500 bytes long")
+	v.Check(*movie.Title != "", "title", required)
+	v.Check(len(*movie.Title) <= 500, "title", "must be nomore than 500 bytes long")
 
-	v.Check(movie.Year != 0, "year", required)
-	v.Check(movie.Year >= 1888, "year", "must be greater than 1888")
-	v.Check(movie.Year <= int32(time.Now().Year()), "year", "must not be in the future")
+	v.Check(*movie.Year != 0, "year", required)
+	v.Check(*movie.Year >= 1888, "year", "must be greater than 1888")
+	v.Check(*movie.Year <= int32(time.Now().Year()), "year", "must not be in the future")
 
-	v.Check(movie.Runtime != 0, "runtime", required)
-	v.Check(movie.Runtime > 0, "runtime", "must be a positive integer")
+	v.Check(*movie.Runtime != 0, "runtime", required)
+	v.Check(*movie.Runtime > 0, "runtime", "must be a positive integer")
 
 	v.Check(movie.Genres != nil, "genres", required)
 	v.Check(len(movie.Genres) >= 1, "genres", "must contain at least 1 genre")
