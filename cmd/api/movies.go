@@ -102,3 +102,26 @@ func (app *application) updateMovieHandler(w http.ResponseWriter, r *http.Reques
 		app.internalServerErr(w, r, err)
 	}
 }
+
+func (app *application) deleteMovieHandler(w http.ResponseWriter, r *http.Request) {
+	id, err := app.readIDParam(r)
+	if err != nil {
+		app.notFoundResponse(w, r)
+		return
+	}
+
+	if err := app.models.Movies.Delete(id); err != nil {
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
+			app.notFoundResponse(w, r)
+		default:
+			app.internalServerErr(w, r, err)
+		}
+	}
+
+	err = app.writeJSON(w, http.StatusNoContent, envelope{"message": "movie successfully deleted"}, nil)
+	if err != nil {
+		app.internalServerErr(w, r, err)
+	}
+
+}
