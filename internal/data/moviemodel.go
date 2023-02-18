@@ -1,6 +1,10 @@
 package data
 
-import "database/sql"
+import (
+	"database/sql"
+
+	"github.com/lib/pq"
+)
 
 // MovieModel defines a type that wraps a sql.DB connection pool
 type MovieModel struct {
@@ -9,7 +13,14 @@ type MovieModel struct {
 
 // Insert inserts movies on the movies table
 func (m MovieModel) Insert(movie *Movie) error {
-	return nil
+	query := `
+	INSERT INTO movies (title, year, runtime, genres)
+	VALUES($1, $2, $3, $4)
+	RETURNING id, created_at, version`
+
+	args := []any{movie.Title, movie.Year, movie.Runtime, pq.Array(movie.Genres)}
+
+	return m.DB.QueryRow(query, args...).Scan(&movie.ID, &movie.CreatedAt, &movie.Version)
 }
 
 // Get fetches a specific record from the movies table

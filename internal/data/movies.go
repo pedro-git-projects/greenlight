@@ -13,3 +13,12 @@ type Movie struct {
 	Genres    []string  `json:"genres,omitempty"`
 	Version   int32     `json:"version"`
 }
+
+func MovieFromDTO(dto *MovieDTO) *Movie {
+	return &Movie{
+		Title:   dto.Title,
+		Year:    dto.Year,
+		Runtime: dto.Runtime,
+		Genres:  dto.Genres,
+	}
+}

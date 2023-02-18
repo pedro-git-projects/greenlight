@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -10,18 +11,30 @@ import (
 
 // createMovieHandler reads data from the client and creates a new movie
 func (app *application) createMovieHandler(w http.ResponseWriter, r *http.Request) {
-	input := &movieDTO{}
+	input := &data.MovieDTO{}
 	if err := app.readJSON(w, r, &input); err != nil {
 		app.badRequestResponse(w, r, err)
 		return
 	}
 
 	v := validator.New()
-	if validateMovieDTO(v, input); !v.IsValid() {
+	if data.ValidateMovieDTO(v, input); !v.IsValid() {
 		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}
 
+	m := data.MovieFromDTO(input)
+	if err := app.models.Movies.Insert(m); err != nil {
+		app.internalServerErr(w, r, err)
+		return
+	}
+
+	headers := make(http.Header)
+	headers.Set("Location", fmt.Sprintf("v1/movies/%d", m.ID))
+
+	if err := app.writeJSON(w, http.StatusCreated, envelope{"movie": m}, headers); err != nil {
+		app.internalServerErr(w, r, err)
+	}
 }
 
 // showMovieHandler displays the movie with specified ID

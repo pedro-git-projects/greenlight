@@ -1,9 +1,8 @@
-package main
+package data
 
 import (
 	"time"
 
-	"github.com/pedro-git-projects/greenlight/internal/data"
 	"github.com/pedro-git-projects/greenlight/internal/validator"
 )
 
@@ -11,14 +10,14 @@ const (
 	required = "must be provided"
 )
 
-type movieDTO struct {
-	Title   string       `json:"title"`
-	Year    int32        `json:"year"`
-	Runtime data.Runtime `json:"runtime"`
-	Genres  []string     `json:"genres"`
+type MovieDTO struct {
+	Title   string   `json:"title"`
+	Year    int32    `json:"year"`
+	Runtime Runtime  `json:"runtime"`
+	Genres  []string `json:"genres"`
 }
 
-func validateMovieDTO(v *validator.Validator, movie *movieDTO) {
+func ValidateMovieDTO(v *validator.Validator, movie *MovieDTO) {
 	v.Check(movie.Title != "", "title", required)
 	v.Check(len(movie.Title) <= 500, "title", "must be nomore than 500 bytes long")
 
