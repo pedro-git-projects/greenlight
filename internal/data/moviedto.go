@@ -18,6 +18,29 @@ type MovieDTO struct {
 	Year    *int32   `json:"year"`
 	Runtime *Runtime `json:"runtime"`
 	Genres  []string `json:"genres"`
+	Filters
+}
+
+func NewMovieDTO(title *string, year *int32, runtime *Runtime, genres []string, page, pageSize int, sort string) *MovieDTO {
+	return &MovieDTO{
+		Title:   title,
+		Year:    year,
+		Runtime: runtime,
+		Genres:  genres,
+		Filters: *NewEmptyFilters(),
+	}
+}
+
+func EmptyMovieDTO() *MovieDTO {
+	r := new(int32)
+	runtime := Runtime(*r)
+	return &MovieDTO{
+		Title:   new(string),
+		Year:    new(int32),
+		Runtime: &runtime,
+		Genres:  make([]string, 0),
+		Filters: *NewEmptyFilters(),
+	}
 }
 
 func ValidateMovieDTO(v *validator.Validator, movie *MovieDTO) {
