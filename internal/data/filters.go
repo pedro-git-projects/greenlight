@@ -1,7 +1,12 @@
 package data
 
-import "github.com/pedro-git-projects/greenlight/internal/validator"
+import (
+	"strings"
 
+	"github.com/pedro-git-projects/greenlight/internal/validator"
+)
+
+// Filters represents the filtering options and parameters
 type Filters struct {
 	Page         int
 	PageSize     int
@@ -9,6 +14,7 @@ type Filters struct {
 	SortSafeList []string
 }
 
+// NewFilters returns a pointer to a new Filters instance
 func NewFilters(page, pageSize int, sort string, sortSafeList []string) *Filters {
 	return &Filters{
 		Page:         page,
@@ -18,6 +24,7 @@ func NewFilters(page, pageSize int, sort string, sortSafeList []string) *Filters
 	}
 }
 
+// NewEmptyFilters retuns a safe zeroed pointer to a new Filters instance
 func NewEmptyFilters() *Filters {
 	return &Filters{
 		Page:         *new(int),
@@ -27,6 +34,7 @@ func NewEmptyFilters() *Filters {
 	}
 }
 
+// ValidateFilters checks if the Filters fields are valid
 func ValidateFilters(v *validator.Validator, f Filters) {
 	v.Check(f.Page > 0, "page", "must be greater than zero")
 	v.Check(f.Page <= 10_000_000, "page", "must be at maximum 10 million")
@@ -34,4 +42,24 @@ func ValidateFilters(v *validator.Validator, f Filters) {
 	v.Check(f.PageSize <= 100, "page", "must at maximum 100")
 
 	v.Check(validator.In(f.Sort, f.SortSafeList...), "sort", "invalid sort value")
+}
+
+// Checks if the cliend provided sort field matches with a entrie
+// in the safe list
+func (f Filters) sortColumn() string {
+	for _, safe := range f.SortSafeList {
+		if f.Sort == safe {
+			return strings.TrimPrefix(f.Sort, "-")
+		}
+	}
+	panic("unsafe sort parameter: " + f.Sort)
+}
+
+// sortDirection returns "ASC" or "DESC" depending on the prefix
+// rune of the sort field
+func (f Filters) sortDirection() string {
+	if strings.HasPrefix(f.Sort, "-") {
+		return "DESC"
+	}
+	return "ASC"
 }

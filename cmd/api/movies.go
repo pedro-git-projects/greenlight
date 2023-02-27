@@ -134,7 +134,7 @@ func (app *application) deleteMovieHandler(w http.ResponseWriter, r *http.Reques
 func (app *application) listMoviesHandler(w http.ResponseWriter, r *http.Request) {
 
 	input := data.EmptyMovieDTO()
-	input.Filters.SortSafeList = []string{"id", "title", "year", "runtime", "-id", "title", "-year", "-runtime"}
+	input.Filters.SortSafeList = []string{"id", "title", "year", "runtime", "-id", "-title", "-year", "-runtime"}
 
 	v := validator.New()
 	qs := r.URL.Query()
