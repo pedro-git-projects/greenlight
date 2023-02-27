@@ -63,3 +63,13 @@ func (f Filters) sortDirection() string {
 	}
 	return "ASC"
 }
+
+// limit returns the pagination limit
+func (f Filters) limit() int {
+	return f.PageSize
+}
+
+// offset returns the pagination offset
+func (f Filters) offset() int {
+	return (f.Page - 1) * f.PageSize
+}
