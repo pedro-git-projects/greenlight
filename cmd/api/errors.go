@@ -7,7 +7,7 @@ import (
 
 // the logError reciever is a helper for loggin error messages
 func (app *application) logError(r *http.Request, err error) {
-	app.logger.Println(err)
+	app.logger.PrintError(err, nil)
 }
 
 // the errorResponse reciever is helper for sending JSON-formatted error messages
